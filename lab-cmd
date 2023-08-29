@@ -1,0 +1,63 @@
+Here are the steps to install MongoDB on Ubuntu:
+1. Import the MongoDB GPG key:
+   
+   wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+   
+2. Add the MongoDB repository:
+   
+   echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+   
+3. Update the package repository:
+   
+   sudo apt update
+   
+4. Install MongoDB:
+   
+   sudo apt install mongodb-org
+
+Once MongoDB is installed, you can start the MongoDB service with:
+sudo systemctl start mongod
+You can also enable MongoDB to start automatically on system boot with:
+sudo systemctl enable mongod
+After completing these steps, MongoDB should be successfully installed on your system.
+
+i get this errror
+E: The repository 'https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 Release' is not signed.
+
+
+To resolve this issue, you can manually import the GPG key and then retry the installation. Please follow these steps:
+1. Import the MongoDB GPG key:
+   
+   wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+   
+2. Clear the package list cache:
+   
+   sudo apt clean
+   
+3. Update the package repository:
+   
+   sudo apt update
+   
+4. Retry the MongoDB installation:
+   
+   sudo apt install mongodb-org
+
+
+After installing MongoDB, you can start the MongoDB service and keep it running in the background by following these steps:
+1. Start the MongoDB service:
+   
+   sudo systemctl start mongod
+   
+2. Verify that MongoDB has started successfully. You can check the status of the service by running:
+   
+   sudo systemctl status mongod
+   
+   If MongoDB has started successfully, you should see a message indicating that the service is active (running).
+3. Enable MongoDB to start automatically on system boot:
+   
+   sudo systemctl enable mongod
+   
+   Enabling the service ensures that MongoDB will start automatically whenever your system reboots.
+With these steps, MongoDB should be up and running in the background, ready to accept connections.
+
+

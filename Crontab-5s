@@ -1,0 +1,13 @@
+* * * * * /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 5; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 10; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 15; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 20; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 25; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 30; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 35; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 40; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 45; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 50; /usr/bin/python3 /home/kham/python_files/requester.py
+* * * * * sleep 55; /usr/bin/python3 /home/kham/python_files/requester.py
+

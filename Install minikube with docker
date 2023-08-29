@@ -1,0 +1,190 @@
+1. Update your system:
+   
+   sudo apt update
+   sudo apt upgrade
+   
+2. Install Docker:
+   
+   sudo apt install docker.io
+   
+3. Add your user to the docker group to run Docker commands without sudo:
+   
+   sudo usermod -aG docker $USER
+   newgrp docker
+   
+4. Install kubectl (Kubernetes command-line tool):
+   
+   sudo snap install kubectl --classic
+   
+5. Download and install Minikube:
+   
+   curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+   sudo install minikube-linux-amd64 /usr/local/bin/minikube
+   
+6. Start Minikube with the Docker driver:
+   
+   minikube start --driver=docker
+   
+7. Verify the installation:
+   
+   minikube status
+   kubectl version
+   
+That's it! Minikube should now be installed with the Docker driver on your Ubuntu 20.04 machine. You can start deploying and managing Kubernetes applications locally.
+
+
+---------install elasticsearch & kibana-------------
+
+Step 1: Start Minikube
+- Start Minikube by running the following command in your terminal:
+minikube start
+Step 2: Create a Namespace
+- Create a Kubernetes namespace for your Elasticsearch and Kibana deployment by running the following command:
+kubectl create namespace elasticsearch
+Step 3: Create an Elasticsearch Deployment and Service
+- Create a file named elasticsearch.yaml and add the following YAML configuration:
+yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.8.1
+        ports:
+        - containerPort: 9200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  ports:
+  - protocol: TCP
+    port: 9200
+    targetPort: 9200
+- Apply the configuration by running the following command:
+kubectl apply -f elasticsearch.yaml
+Step 4: Verify Elasticsearch Deployment
+- Check the status of the Elasticsearch deployment by running the following command:
+kubectl get pods -n elasticsearch
+- Wait until the pod is in the "Running" state.
+Step 5: Create a Kibana Deployment and Service
+- Create a file named kibana.yaml and add the following YAML configuration:
+yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:8.8.1
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch:9200"
+        ports:
+        - containerPort: 5601
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: elasticsearch
+spec:
+  selector:
+    app: kibana
+  ports:
+  - protocol: TCP
+    port: 5601
+    targetPort: 5601
+- Apply the configuration by running the following command:
+kubectl apply -f kibana.yaml
+Step 6: Verify Kibana Deployment
+- Check the status of the Kibana deployment by running the following command:
+kubectl get pods -n elasticsearch
+- Wait until the pod is in the "Running" state.
+Step 7: Access Kibana UI
+- To access the Kibana UI, you need to create a port-forward to the Kibana service. Run the following command:
+kubectl port-forward -n elasticsearch svc/kibana 5601:5601
+- Open your web browser and navigate to http://localhost:5601 to access the Kibana UI.
+That's it! You now have Elasticsearch running in Minikube with Kibana as the UI connected to Elasticsearch. You can explore and interact with Elasticsearch using the Kibana UI. (edited) 
+
+
+======================create persistent volumn for elasticsearch==================
+
+Step 1: Create a Persistent Volume (PV)
+- Create a file named elasticsearch-pv.yaml and add the following YAML configuration as an example:
+yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: elasticsearch-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  hostPath:
+    path: /path/to/host/directory
+- Modify the storage field to specify the desired storage size.
+- Modify the path field under hostPath to point to the directory on the host machine where you want to store the Elasticsearch data.
+- Apply the configuration by running the following command:
+kubectl apply -f elasticsearch-pv.yaml
+Step 2: Create a Persistent Volume Claim (PVC)
+- Create a file named elasticsearch-pvc.yaml and add the following YAML configuration:
+yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+- Modify the storage field to match the storage size specified in the PV configuration.
+- Apply the configuration by running the following command:
+kubectl apply -f elasticsearch-pvc.yaml
+Step 3: Update Elasticsearch Deployment
+- Modify your existing elasticsearch.yaml file to include the PVC volume claim. Add the following volume and volume mount sections under the spec.template.spec.containers section:
+yaml
+volumes:
+- name: elasticsearch-data
+  persistentVolumeClaim:
+    claimName: elasticsearch-pvc
+yaml
+volumeMounts:
+- name: elasticsearch-data
+  mountPath: /usr/share/elasticsearch/data
+- Apply the updated configuration by running the following command:
+kubectl apply -f elasticsearch.yaml
+By following these steps, you will configure persistent storage for Elasticsearch using PV and PVC in Kubernetes. The Elasticsearch data will be stored in the specified directory on the host machine, ensuring that the data persists even if the Elasticsearch pod restarts or gets rescheduled. (edited) 
