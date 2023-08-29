@@ -1,0 +1,44 @@
+1. list all deployments across namespaces
+
+kubectl get deployments --all-namespaces
+
+2. List all deployments of a specified namespace
+
+kubectl get deployments -n <namespace>
+
+3. Scale down replica to 0 and delete deployment
+
+kubectl scale deployment <deployment-name> --replicas=0 -n <namespace>
+kubectl delete deployment <deployment-name> -n <namespace>
+ex:
+
+kubectl scale deployment elasticsearch --replicas=0 -n elasticsearch
+kubectl delete deployment elasticsearch -n elasticsearch
+
+
+4. To access the Minikube master from another host, you can use port forwarding to forward the Kubernetes API server's port to your local machine. Here's how you can do it:
+  Start port forwarding with the following command:
+
+  The error message indicates that the kubernetes service is indeed missing a selector, which is required for the kubectl port-forward command to work.
+To resolve this issue, you can try the following steps:
+a. Open the kubernetes service definition using the following command:
+   
+   kubectl edit svc kubernetes
+   
+b. Locate the metadata section in the YAML file that opens and add a selector to the service. It should look similar to the following:
+   
+yaml
+   metadata:
+     name: kubernetes
+     namespace: default
+   spec:
+     selector:
+       k8s-app: kube-apiserver
+     ports:
+       - protocol: TCP
+         port: 443
+         targetPort: 8443
+   
+c. Save the changes and exit the editor.
+   
+   kubectl port-forward --address 0.0.0.0 svc/kubernetes 8443:443
